@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 // Create a new instance of Sequelize
 export const sequelize = new Sequelize('blog', 'postgres', 'Rajesh@875843', {
   host: 'localhost',
-  dialect: 'postgres' // or another supported dialect
+  dialect: 'postgres' 
 });
 
 // Authenticate the connection
