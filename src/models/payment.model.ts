@@ -32,12 +32,6 @@ export const Payment = sequelize.define('Payment', {
     type: DataTypes.STRING,
     unique: true,
   },
-  paymentMethod: {
-    type: DataTypes.STRING,
-  },
-  description: {
-    type: DataTypes.STRING,
-  },
 });
 
 User.hasMany(Payment);

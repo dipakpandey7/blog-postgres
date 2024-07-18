@@ -1,51 +1,39 @@
 import { Request, Response } from 'express';
-import { createPaymentIntent, confirmPayment, getAllPayments, getPaymentsByUser } from '../services/paymentService';
+import { stripe } from '../config/stripe';
 import { Payment } from '../models/payment.model';
 
-export const createPaymentIntentController = async (req: Request, res: Response) => {
-    try {
-      const { amount, currency } = req.body;
-      const userId = (req.user as any).userId; 
-      if (!userId) {
-        return res.status(401).json({ error: 'User not authenticated' });
-      }
-  
-      const paymentIntent = await createPaymentIntent(amount, currency, userId);
-      res.status(200).json(paymentIntent);
-    } catch (error) {
-      console.error('Error creating payment intent:', error);
-      res.status(500).json({ error: 'Failed to create payment intent' });
-    }
-  };
+export const createPaymentPage = (req: Request, res: Response) => {
+  res.render('payments/create', { stripePublicKey: process.env.STRIPE_PUBLIC_KEY });
+};
 
-export const confirmPaymentController = async (req: Request, res: Response) => {
+export const createPaymentIntent = async (req: Request, res: Response) => {
   try {
-    const { paymentIntentId } = req.body;
-    const confirmedPayment = await confirmPayment(paymentIntentId);
-    res.status(200).json(confirmedPayment);
+    const { amount } = req.body;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: 'usd',
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    console.error('Error confirming payment:', error);
-    res.status(500).json({ error: 'Failed to confirm payment' });
+    console.error('Error creating payment intent:', error);
+    res.status(500).json({ error: 'Failed to create payment intent' });
   }
 };
 
-export const getAllPaymentsController = async (req: Request, res: Response) => {
+export const updatePaymentStatus = async (req: Request, res: Response) => {
   try {
-    const payments = await getAllPayments();
-    res.status(200).json(payments);
+    const { paymentIntentId, status, amount } = req.body;
+    await Payment.create({
+      paymentIntentId,
+      status,
+      amount: amount / 100,
+      userId: (req.user as any).id,
+      currency: 'usd',
+    });
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error fetching all payments:', error);
-    res.status(500).json({ error: 'Failed to fetch payments' });
-  }
-};
-
-export const getPaymentsByUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const payments = await getPaymentsByUser(userId);
-    res.status(200).json(payments);
-  } catch (error) {
-    console.error('Error fetching user payments:', error);
-    res.status(500).json({ error: 'Failed to fetch user payments' });
+    console.error('Error updating payment status:', error);
+    res.status(500).json({ error: 'Failed to update payment status' });
   }
 };
