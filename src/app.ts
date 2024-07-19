@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import paymentRoutes from './routes/paymentRoute';
 import uploadRoutes from './routes/uploadRoutes';
+import limiter from './middlewares/limiterMiddleware';
 
 
 
@@ -19,7 +20,7 @@ const app = express();
 app.set('views', './views');
 app.set('views', path.join(__dirname, '..', 'views'));
 dotenv.config();
-
+app.use(limiter);
 app.use(express.json());
 
 
