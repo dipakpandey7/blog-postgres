@@ -1,6 +1,7 @@
 
 import {  DataTypes  } from "sequelize";
 import { sequelize } from "../DataBase";
+import OTP from './otp.model';
 
  export const User = sequelize.define("User", {
   id: {

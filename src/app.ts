@@ -9,6 +9,7 @@ import postRoute from "./routes/postRoute";
 import dotenv from 'dotenv';
 import path from 'path';
 import paymentRoutes from './routes/paymentRoute';
+import uploadRoutes from './routes/uploadRoutes';
 
 
 
@@ -33,6 +34,8 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/auth', authRoute);
 app.use("/api/post" , postRoute);
 app.use('/email', emailRoutes);
+app.use('/api', uploadRoutes);
+
 
 app.use('/api/payments', paymentRoutes);
 
